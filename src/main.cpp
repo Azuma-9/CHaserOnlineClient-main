@@ -1217,6 +1217,7 @@ int main() {
 		score = 0;
 		warp = false;
 
+
 		for (int i = 0; i < 4; i++) {
 			if (seen[y + dy[i]][x + dx[i]] >= 1)mapp[y + dy[i]][x + dx[i]] = mapp[y + dy[i]][x + dx[i]] - (seen[y + dy[i]][x + dx[i]] * 10);
 			if (map[y + dy[i]][x + dx[i]] == 70)mapp[y + dy[i]][x + dx[i]] = 500;

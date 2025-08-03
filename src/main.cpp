@@ -8,14 +8,16 @@ vector<vector<int>>seen(100, vector<int>(100, 0));//既に通ったマスか否かを管理（
 vector<int>mp(5, 0); //例外処理をした時のスコアを格納する配列
 
 int y = 50, x = 50;//座標の初期値
+int miny = 50, maxy = 50, minx = 50, maxx = 50;
 
-string returnCode;
-vector<int>returnNum(100, 0);
+string returnCode;//サーバーからの戻り値（string）を格納
+vector<int>returnNum(100, 0);//キャストした戻り値を格納
 
 
-int dy[] = { -1,0,0,1 };
-int dx[] = { 0,-1,1,0 };
+int dy[] = { -1,0,0,1 };//上　左　右　下　
+int dx[] = { 0,-1,1,0 };//上　左　右　下
 
+//戻り値をintにキャスト
 vector<int> ParseInt(string t) {
 	vector<int>vec;
 	stringstream ss(t);
@@ -34,318 +36,45 @@ vector<int> ParseInt(string t) {
 	return vec;
 }
 
-void Set3x3Map(int centerY, int centerX) {
-	int idx = 0;
-	for (int i = -1; i <= 1; i++) {
-		for (int j = -1; j <= 1; j++) {
-			map[centerY + i][centerX + j] = returnNum[idx++];
+//周囲情報をmap配列に格納
+void MapUpdate(string cmd) {
+	int sy = -1, ey = 1;
+	int sx = -1, ex = 1;
+
+	int index = 0;
+
+	if (cmd == "pu3lu") { sy = -3; ey = -1; sx = -1; ex = 1; }
+	else if(cmd=="pd3ld") { sy = 1; ey = 3; sx = -1; ex = 1; }
+	else if (cmd == "pl3ll") { sy = -1; ey = 1; sx = -3; ex = -1; }
+	else if (cmd == "pr3lr") { sy = -1; ey = 1; sx = 1; ex = 3; }
+	else if (cmd == "du") { sy = -3; ey = -1; sx = -1; ex = 1; }
+	else if (cmd == "dd") { sy = 1; ey = 3; sx = -1; ex = 1; }
+	else if (cmd == "dl") { sy = -1; ey = 1; sx = -3; ex = -1; }
+	else if (cmd == "dr") { sy = -1; ey = 1; sx = 1; ex = 3; }
+	else if (cmd == "dru") { sy = -3; ey = -1; sx = 1; ex = 3; }
+	else if (cmd == "drd") { sy = 1; ey = 3; sx = 1; ex = 3; }
+	else if (cmd == "dlu") { sy = -3; ey = -1; sx = -3; ex = -1; }
+	else if (cmd == "dld") { sy = 1; ey = 3; sx = 1; ex = 3; }
+
+	for (int i = sy; i <= ey; i++) {
+		for (int j = sx; j <= ex; j++) {
+			int iy = y + i;
+			int jx = x + j;
+			map[iy][jx] = returnNum[index];
+			index++;
 		}
 	}
 }
 
-//void MapUpdate(string cmd) {
-//	if (cmd == "gr" || cmd == "gru" || cmd == "grl" || cmd == "grr" || cmd == "grd") {
-//		try {
-//			map[y - 1][x - 1] = returnNum[0];
-//			map[y - 1][x] = returnNum[1];
-//			map[y - 1][x + 1] = returnNum[2];
-//			map[y][x - 1] = returnNum[3];
-//			map[y][x] = returnNum[4];
-//			map[y][x + 1] = returnNum[5];
-//			map[y + 1][x - 1] = returnNum[6];
-//			map[y + 1][x] = returnNum[7];
-//			map[y + 1][x + 1] = returnNum[8];
-//		}
-//		catch(exception er){
-//			cout << er.what() << 2 << endl;
-//		}
-//	}
-//	else if (cmd == "wu" || cmd == "wl" || cmd == "wr" || cmd == "wd") {
-//		try {
-//			map[y - 1][x - 1] = returnNum[0];
-//			map[y - 1][x] = returnNum[1];
-//			map[y - 1][x + 1] = returnNum[2];
-//			map[y][x - 1] = returnNum[3];
-//			map[y][x] = returnNum[4];
-//			map[y][x + 1] = returnNum[5];
-//			map[y + 1][x - 1] = returnNum[6];
-//			map[y + 1][x] = returnNum[7];
-//			map[y + 1][x + 1] = returnNum[8];
-//		}
-//		catch (exception er) {
-//			cout << er.what() << 3 << endl;
-//		}
-//	}
-//	else if (cmd == "keilu" || cmd == "keiru" || cmd == "keild" || cmd == "keird") {
-//		try {
-//			map[y - 1][x - 1] = returnNum[0];
-//			map[y - 1][x] = returnNum[1];
-//			map[y - 1][x + 1] = returnNum[2];
-//			map[y][x - 1] = returnNum[3];
-//			map[y][x] = returnNum[4];
-//			map[y][x + 1] = returnNum[5];
-//			map[y + 1][x - 1] = returnNum[6];
-//			map[y + 1][x] = returnNum[7];
-//			map[y + 1][x + 1] = returnNum[8];
-//		}
-//		catch (exception er) {
-//			cout << er.what() << 4 << endl;
-//		}
-//	}
-//	else if (cmd == "w3u" || cmd == "w3l" || cmd == "w3r" || cmd == "w3d") {
-//		try {
-//			map[y - 1][x - 1] = returnNum[0];
-//			map[y - 1][x] = returnNum[1];
-//			map[y - 1][x + 1] = returnNum[2];
-//			map[y][x - 1] = returnNum[3];
-//			map[y][x] = returnNum[4];
-//			map[y][x + 1] = returnNum[5];
-//			map[y + 1][x - 1] = returnNum[6];
-//			map[y + 1][x] = returnNum[7];
-//			map[y + 1][x + 1] = returnNum[8];
-//		}
-//		catch (exception er) {
-//			cout << er.what() << 5 << endl;
-//		}
-//	}
-//	else if (cmd == "pd2w2u" || cmd == "pu2w2d" || cmd == "pr2w2l" || cmd == "pl2w2r") {
-//		try {
-//			map[y - 1][x - 1] = returnNum[0];
-//			map[y - 1][x] = returnNum[1];
-//			map[y - 1][x + 1] = returnNum[2];
-//			map[y][x - 1] = returnNum[3];
-//			map[y][x] = returnNum[4];
-//			map[y][x + 1] = returnNum[5];
-//			map[y + 1][x - 1] = returnNum[6];
-//			map[y + 1][x] = returnNum[7];
-//			map[y + 1][x + 1] = returnNum[8];
-//		}
-//		catch (exception er) {
-//			cout << er.what() << 6 << endl;
-//		}
-//	}
-//	else if (cmd == "pd2wu" || cmd == "pu2wd" || cmd == "pr2wl" || cmd == "pl2wr") {
-//		try {
-//			map[y - 1][x - 1] = returnNum[0];
-//			map[y - 1][x] = returnNum[1];
-//			map[y - 1][x + 1] = returnNum[2];
-//			map[y][x - 1] = returnNum[3];
-//			map[y][x] = returnNum[4];
-//			map[y][x + 1] = returnNum[5];
-//			map[y + 1][x - 1] = returnNum[6];
-//			map[y + 1][x] = returnNum[7];
-//			map[y + 1][x + 1] = returnNum[8];
-//		}
-//		catch (exception er) {
-//			cout << er.what() << 7 << endl;
-//		}
-//	}
-//	else if (cmd == "dlu") {
-//		map[y - 3][x - 3] = returnNum[0];
-//		map[y - 3][x - 2] = returnNum[1];
-//		map[y - 3][x - 1] = returnNum[2];
-//		map[y - 2][x - 3] = returnNum[3];
-//		map[y - 2][x - 2] = returnNum[4];
-//		map[y - 2][x - 1] = returnNum[5];
-//		map[y - 1][x - 3] = returnNum[6];
-//		map[y - 1][x - 2] = returnNum[7];
-//		map[y - 1][x - 1] = returnNum[8];
-//	}
-//	else if (cmd == "du") {
-//		map[y - 3][x - 1] = returnNum[0];
-//		map[y - 3][x] = returnNum[1];
-//		map[y - 3][x + 1] = returnNum[2];
-//		map[y - 2][x - 1] = returnNum[3];
-//		map[y - 2][x] = returnNum[4];
-//		map[y - 2][x + 1] = returnNum[5];
-//		map[y - 1][x - 1] = returnNum[6];
-//		map[y - 1][x] = returnNum[7];
-//		map[y - 1][x + 1] = returnNum[8];
-//	}
-//	else if (cmd == "dru") {
-//		map[y - 3][x + 1] = returnNum[0];
-//		map[y - 3][x + 2] = returnNum[1];
-//		map[y - 3][x + 3] = returnNum[2];
-//		map[y - 2][x + 1] = returnNum[3];
-//		map[y - 2][x + 2] = returnNum[4];
-//		map[y - 2][x + 3] = returnNum[5];
-//		map[y - 1][x + 1] = returnNum[6];
-//		map[y - 1][x + 2] = returnNum[7];
-//		map[y - 1][x + 3] = returnNum[8];
-//	}
-//	else if (cmd == "dl") {
-//		map[y - 1][x - 3] = returnNum[0];
-//		map[y - 1][x - 2] = returnNum[1];
-//		map[y - 1][x - 1] = returnNum[2];
-//		map[y][x - 3] = returnNum[3];
-//		map[y][x - 2] = returnNum[4];
-//		map[y][x - 1] = returnNum[5];
-//		map[y + 1][x - 3] = returnNum[6];
-//		map[y + 1][x - 2] = returnNum[7];
-//		map[y + 1][x - 1] = returnNum[8];
-//	}
-//	else if (cmd == "dr") {
-//		map[y - 1][x + 1] = returnNum[0];
-//		map[y - 1][x + 2] = returnNum[1];
-//		map[y - 1][x + 3] = returnNum[2];
-//		map[y][x + 1] = returnNum[3];
-//		map[y][x + 2] = returnNum[4];
-//		map[y][x + 3] = returnNum[5];
-//		map[y + 1][x + 1] = returnNum[6];
-//		map[y + 1][x + 2] = returnNum[7];
-//		map[y + 1][x + 3] = returnNum[8];
-//	}
-//	else if (cmd == "dld") {
-//		map[y + 1][x - 3] = returnNum[0];
-//		map[y + 1][x - 2] = returnNum[1];
-//		map[y + 1][x - 1] = returnNum[2];
-//		map[y + 2][x - 3] = returnNum[3];
-//		map[y + 2][x - 2] = returnNum[4];
-//		map[y + 2][x - 1] = returnNum[5];
-//		map[y + 3][x - 3] = returnNum[6];
-//		map[y + 3][x - 2] = returnNum[7];
-//		map[y + 3][x - 1] = returnNum[8];
-//	}
-//	else if (cmd == "dd") {
-//		map[y + 1][x - 1] = returnNum[0];
-//		map[y + 1][x] = returnNum[1];
-//		map[y + 1][x + 1] = returnNum[2];
-//		map[y + 2][x - 1] = returnNum[3];
-//		map[y + 2][x] = returnNum[4];
-//		map[y + 2][x + 1] = returnNum[5];
-//		map[y + 3][x - 1] = returnNum[6];
-//		map[y + 3][x] = returnNum[7];
-//		map[y + 3][x + 1] = returnNum[8];
-//
-//	}
-//	else if (cmd == "drd") {
-//		map[y + 1][x + 1] = returnNum[0];
-//		map[y + 1][x + 2] = returnNum[1];
-//		map[y + 1][x + 3] = returnNum[2];
-//		map[y + 2][x + 1] = returnNum[3];
-//		map[y + 2][x + 2] = returnNum[4];
-//		map[y + 2][x + 3] = returnNum[5];
-//		map[y + 3][x + 1] = returnNum[6];
-//		map[y + 3][x + 2] = returnNum[7];
-//		map[y + 3][x + 3] = returnNum[8];
-//	}
-//	else if (cmd == "pu3lu") {
-//		map[y - 3][x - 1] = returnNum[0];
-//		map[y - 3][x] = returnNum[1];
-//		map[y - 3][x + 1] = returnNum[2];
-//		map[y - 2][x - 1] = returnNum[3];
-//		map[y - 2][x] = returnNum[4];
-//		map[y - 2][x + 1] = returnNum[5];
-//		map[y - 1][x - 1] = returnNum[6];
-//		map[y - 1][x] = returnNum[7];
-//		map[y - 1][x + 1] = returnNum[8];
-//	}
-//	else if (cmd == "pd3ld") {
-//		map[y + 1][x - 1] = returnNum[0];
-//		map[y + 1][x] = returnNum[1];
-//		map[y + 1][x + 1] = returnNum[2];
-//		map[y + 2][x - 1] = returnNum[3];
-//		map[y + 2][x] = returnNum[4];
-//		map[y + 2][x + 1] = returnNum[5];
-//		map[y + 3][x - 1] = returnNum[6];
-//		map[y + 3][x] = returnNum[7];
-//		map[y + 3][x + 1] = returnNum[8];
-//	}
-//	else if (cmd == "pl3ll") {
-//		map[y - 1][x - 3] = returnNum[0];
-//		map[y - 1][x - 2] = returnNum[1];
-//		map[y - 1][x - 1] = returnNum[2];
-//		map[y][x - 3] = returnNum[3];
-//		map[y][x - 2] = returnNum[4];
-//		map[y][x - 1] = returnNum[5];
-//		map[y + 1][x - 3] = returnNum[6];
-//		map[y + 1][x - 2] = returnNum[7];
-//		map[y + 1][x - 1] = returnNum[8];
-//	}
-//	else if (cmd == "pr3lr") {
-//		map[y - 1][x + 1] = returnNum[0];
-//		map[y - 1][x + 2] = returnNum[1];
-//		map[y - 1][x + 3] = returnNum[2];
-//		map[y][x + 1] = returnNum[3];
-//		map[y][x + 2] = returnNum[4];
-//		map[y][x + 3] = returnNum[5];
-//		map[y + 1][x + 1] = returnNum[6];
-//		map[y + 1][x + 2] = returnNum[7];
-//		map[y + 1][x + 3] = returnNum[8];
-//	}
-//
-//}
-
-void MapUpdate(string cmd) {
-	if (cmd == "gr" || cmd == "gru" || cmd == "grl" || cmd == "grr" || cmd == "grd" ||
-		cmd == "wu" || cmd == "wl" || cmd == "wr" || cmd == "wd" ||
-		cmd == "keilu" || cmd == "keiru" || cmd == "keild" || cmd == "keird" ||
-		cmd == "w3u" || cmd == "w3l" || cmd == "w3r" || cmd == "w3d" ||
-		cmd == "pd2w2u" || cmd == "pu2w2d" || cmd == "pr2w2l" || cmd == "pl2w2r"
-		) {
-		Set3x3Map(y, x);
-	}
-	else if (cmd == "dlu")Set3x3Map(y - 2, x - 2);
-	else if (cmd == "du")Set3x3Map(y - 2, x);
-	else if (cmd == "dru")Set3x3Map(y - 2, x + 2);
-	else if (cmd == "dl") Set3x3Map(y, x - 2);
-	else if (cmd == "dr") Set3x3Map(y, x + 2);
-	else if (cmd == "dld")Set3x3Map(y + 2, x - 2);
-	else if (cmd == "dd") Set3x3Map(y + 2, x);
-	else if (cmd == "drd")Set3x3Map(y + 2, x + 2);
-	else if (cmd == "pu3lu") {
-		map[y - 3][x - 1] = returnNum[0];
-		map[y - 3][x] = returnNum[1];
-		map[y - 3][x + 1] = returnNum[2];
-		map[y - 2][x - 1] = returnNum[3];
-		map[y - 2][x] = returnNum[4];
-		map[y - 2][x + 1] = returnNum[5];
-		map[y - 1][x - 1] = returnNum[6];
-		map[y - 1][x] = returnNum[7];
-		map[y - 1][x + 1] = returnNum[8];
-	}
-	else if (cmd == "pd3ld") {
-		map[y + 1][x - 1] = returnNum[0];
-		map[y + 1][x] = returnNum[1];
-		map[y + 1][x + 1] = returnNum[2];
-		map[y + 2][x - 1] = returnNum[3];
-		map[y + 2][x] = returnNum[4];
-		map[y + 2][x + 1] = returnNum[5];
-		map[y + 3][x - 1] = returnNum[6];
-		map[y + 3][x] = returnNum[7];
-		map[y + 3][x + 1] = returnNum[8];
-	}
-	else if (cmd == "pl3ll") {
-		map[y - 1][x - 3] = returnNum[0];
-		map[y - 1][x - 2] = returnNum[1];
-		map[y - 1][x - 1] = returnNum[2];
-		map[y][x - 3] = returnNum[3];
-		map[y][x - 2] = returnNum[4];
-		map[y][x - 1] = returnNum[5];
-		map[y + 1][x - 3] = returnNum[6];
-		map[y + 1][x - 2] = returnNum[7];
-		map[y + 1][x - 1] = returnNum[8];
-	}
-	else if (cmd == "pr3lr") {
-		map[y - 1][x + 1] = returnNum[0];
-		map[y - 1][x + 2] = returnNum[1];
-		map[y - 1][x + 3] = returnNum[2];
-		map[y][x + 1] = returnNum[3];
-		map[y][x + 2] = returnNum[4];
-		map[y][x + 3] = returnNum[5];
-		map[y + 1][x + 1] = returnNum[6];
-		map[y + 1][x + 2] = returnNum[7];
-		map[y + 1][x + 3] = returnNum[8];
-	}
-}
+//座標を移動
 void Coordinate(string cmd) {
 
 	map[y][x] = 8;
 	mapp[y][x] = 100;
-	if (cmd == "gru" || cmd == "wu" || cmd == "du" || cmd == "pl3ll")y--;
-	else if (cmd == "grl" || cmd == "wl" || cmd == "dl" || cmd == "pd3ld")x--;
-	else if (cmd == "grr" || cmd == "wr" || cmd == "dr" || cmd == "pu3lu")x++;
-	else if (cmd == "grd" || cmd == "wd" || cmd == "dd" || cmd == "pr3lr")y++;
+	if (cmd == "gru" || cmd == "wu" || cmd == "du" || cmd == "pl3ll" || cmd == "pl3sl")y--;
+	else if (cmd == "grl" || cmd == "wl" || cmd == "dl" || cmd == "pd3ld" || cmd == "pd3sd")x--;
+	else if (cmd == "grr" || cmd == "wr" || cmd == "dr" || cmd == "pu3lu" || cmd == "pu3su")x++;
+	else if (cmd == "grd" || cmd == "wd" || cmd == "dd" || cmd == "pr3lr" || cmd == "pr3sr")y++;
 	else if (cmd == "pd2w2u")y -= 2;
 	else if (cmd == "pu2w2d")y += 2;
 	else if (cmd == "pr2w2l")x -= 2;
@@ -362,6 +91,10 @@ void Coordinate(string cmd) {
 	else if (cmd == "pu2wd")y++;
 	else if (cmd == "pr2wl")x--;
 	else if (cmd == "pl2wr")x++;
+	else if (cmd == "pru2wld") { y++; x--; }
+	else if (cmd == "plu2wrd") { y++; x++; }
+	else if (cmd == "prd2wlu") { y--; x--; }
+	else if (cmd == "pld2wru") { y--; x++; }
 	else if (cmd == "keilu") { y -= 2; x--; }
 	else if (cmd == "keiru") { y -= 2; x++; }
 	else if (cmd == "keild") { y += 2; x--; }
@@ -400,6 +133,7 @@ void color(int value, int my, int mx, int ci, int cj) {
 	else if (seen[ci][cj] >= 1)printf("\x1b[48;5;153m");//背景色を水色
 }
 
+//スコア表示
 void ShowMapping() {
 	for (int i = y - 3; i <= y + 3; i++) {
 		for (int j = x - 3; j <= x + 3; j++) {
@@ -426,11 +160,12 @@ void ShowMapping2() {
 	}
 }
 
+//マップ表示
 void MapDisplay(int my, int mx) {
 
 	printf("\n----------------------------------------------------\n");
-	for (int i = y - 15; i <= y + 15; i++) {
-		for (int j = x - 15; j <= x + 15; j++) {
+	for (int i = miny - 3; i <= maxy + 3; i++) {
+		for (int j = minx - 3; j <= maxx + 3; j++) {
 			if (i < 0 || i>99 || j < 0 || j>99)continue;
 			color(map[i][j], my, mx, i, j);//
 			if (i == y && j == x)
@@ -561,6 +296,7 @@ void MapDisplay(int my, int mx) {
 	}
 }
 
+//上下左右に移動する場合どのコマンドを使うか決める
 string DecideCommand(int dy, int dx) {
 	int cnt = 0;//未探索のマス（情報が不明）をカウントするための変数
 	int cnt2 = 0;//未探索のマス（情報が不明）をカウントするための変数
@@ -644,6 +380,7 @@ string DecideCommand(int dy, int dx) {
 	}
 }
 
+//ワープ用関数
 void Warp(int warpnum) {
 	if (warpnum == STAR_RIGHT)
 		x += 10;
@@ -668,6 +405,11 @@ void Warp(int warpnum) {
 
 	else if (warpnum == STAR_DOWN_5)
 		y += 5;
+
+}
+
+//ブラックスター用関数
+void BlackStar(int warpnum) {
 	switch (warpnum)
 	{
 	case BLACKSTAR_LEFTUP:
@@ -688,6 +430,10 @@ void Warp(int warpnum) {
 	default:
 		break;
 	}
+}
+
+//岩盤用関数
+void BedRock(int warpnum) {
 	if (warpnum == BEDROCK_LEFT_6) {
 		x += 6;
 	}
@@ -719,9 +465,9 @@ void Warp(int warpnum) {
 	else if (warpnum == BEDROCK_UP_15) {
 		y += 15;
 	}
-
 }
 
+//ワープ先の周囲情報を確認
 bool To_Warp(int warpnum, int Y, int X) {
 	int ans = 0;
 	if (warpnum == STAR_RIGHT || warpnum == STAR_RIGHT_5) {
@@ -774,6 +520,152 @@ bool To_Warp(int warpnum, int Y, int X) {
 	}
 }
 
+//ブラックスター先の周囲情報を確認
+bool To_BlackStar(int warpnum, int Y, int X) {
+	int ans = 0;
+	if (warpnum == BLACKSTAR_LEFTUP) {
+		X += 9;
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				if (map[Y + i][X + j] == -2)ans++;
+			}
+		}
+
+		if (ans >= 4)return true;
+		else return false;
+	}
+	else if (warpnum == BLACKSTAR_RIGHTUP) {
+		X -= 9;
+		Y += 10;
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				if (map[Y + i][X + j] == -2)ans++;
+			}
+		}
+
+		if (ans >= 4)return true;
+		else return false;
+	}
+	else if (warpnum == BLACKSTAR_LEFTDOWN) {
+		X += 10;
+		Y -= 1;
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				if (map[Y + i][X + j] == -2)ans++;
+			}
+		}
+
+		if (ans >= 4)return true;
+		else return false;
+	}
+	else if (warpnum == BLACKSTAR_RIGHTDOWN) {
+		X -= 10;
+		Y -= 9;
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				if (map[Y + i][X + j] == -2)ans++;
+			}
+		}
+
+		if (ans >= 4)return true;
+		else return false;
+	}
+}
+
+//岩盤先の周囲情報を確認
+bool To_BedRock(int warpnum, int Y, int X) {
+	int ans = 0;
+	if (warpnum == BEDROCK_LEFT_6) {
+		X += 6;
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				if (map[Y + i][X + j] == -2)ans++;
+			}
+		}
+
+		if (ans >= 4)return true;
+		else return false;
+	}
+	else if (warpnum == BEDROCK_RIGHT_6) {
+		X -= 6;
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				if (map[Y + i][X + j] == -2)ans++;
+			}
+		}
+
+		if (ans >= 4)return true;
+		else return false;
+	}
+	else if (warpnum == BEDROCK_DOWN_6) {
+		Y -= 6;
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				if (map[Y + i][X + j] == -2)ans++;
+			}
+		}
+
+		if (ans >= 4)return true;
+		else return false;
+	}
+	else if (warpnum == BEDROCK_UP_6) {
+		Y += 6;
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				if (map[Y + i][X + j] == -2)ans++;
+			}
+		}
+
+		if (ans >= 4)return true;
+		else return false;
+	}
+	else if (warpnum == BEDROCK_LEFT_15) {
+		X += 15;
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				if (map[Y + i][X + j] == -2)ans++;
+			}
+		}
+
+		if (ans >= 4)return true;
+		else return false;
+	}
+	else if (warpnum == BEDROCK_RIGHT_15) {
+		X -= 15;
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				if (map[Y + i][X + j] == -2)ans++;
+			}
+		}
+
+		if (ans >= 4)return true;
+		else return false;
+	}
+	else if (warpnum == BEDROCK_DOWN_15) {
+		Y -= 15;
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				if (map[Y + i][X + j] == -2)ans++;
+			}
+		}
+
+		if (ans >= 4)return true;
+		else return false;
+	}
+	else if (warpnum == BEDROCK_UP_15) {
+		Y += 15;
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				if (map[Y + i][X + j] == -2)ans++;
+			}
+		}
+
+		if (ans >= 4)return true;
+		else return false;
+	}
+}
+
+//移動可能なマスに行くためのペア
 vector<pair<int, int>>dist = {//0-19
 	{-1,0},{0,-1},{0,1},{1,0},
 	{-1,-1}, {-1,1}, {1,-1},
@@ -828,14 +720,19 @@ vector<pair<int, int>>directions_4 = {
 };
 
 int main() {
+	//一番最初にgrコマンドを送信
 	returnCode = client.GetReadyCheck("gr");
+	//int型に変換
 	returnNum = ParseInt(returnCode);
+	//コマンドに応じてy,x座標を移動させる
 	Coordinate("gr");
+	//コマンドによって得た周囲情報をmap配列に格納する
 	MapUpdate("gr");
+	//既に通ったマスの回数を増やす
 	seen[y][x]++;
-	int turn = 0;
-	string cmd = "";
-	string cmd2 = "";
+	int turn = 0;//ターン数をカウントする変数
+	string cmd = "";//行動コマンド
+	string cmd2 = "";//grコマンド
 	while (1) {
 		turn++;
 		double dir;//距離
@@ -851,11 +748,13 @@ int main() {
 		int zy = 0, zx = 0;
 		vector<bool>z(4, false);
 
+		//周囲に敵クライアントがいるかチェック
 		for (int i = 0; i < 9; i++) {
 			if (i == 4 || i == 0 || i == 2 || i == 6 || i == 8)continue;
 			if (1000 <= returnNum[i])put = true;
 		}
 
+		//mapのアイテムに応じてスコアを付ける
 		for (int i = y - 3; i <= y + 3; i++) {
 			for (int j = x - 3; j <= x + 3; j++) {
 				if (i == y && j == x)continue;
@@ -889,6 +788,7 @@ int main() {
 			}
 		}
 
+		//最後にgrで移動した方向と違うマスのスコアを引く
 		for (int i = y - 3; i <= y + 3; i++) {
 			for (int j = x - 3; j <= x + 3; j++) {
 				if (i == y && j == x)continue;
@@ -932,8 +832,23 @@ int main() {
 				if (abs(y - iy) == 1 && abs(x - jx) == 1)mapp[iy][jx] -= 10;
 			}
 
-			if (20 <= map[iy][jx] && map[iy][jx] <= 23 || 30 <= map[iy][jx] && map[iy][jx] <= 33 || 60 <= map[iy][jx] && map[iy][jx] <= 63 || 40 <= map[iy][jx] && map[iy][jx] <= 53) {
+			//ワープ先の周囲情報を確認
+			if (20 <= map[iy][jx] && map[iy][jx] <= 23 || 30 <= map[iy][jx] && map[iy][jx] <= 33 || 40 <= map[iy][jx] && map[iy][jx] <= 53) {
 				if (!To_Warp(map[iy][jx], iy, jx)) {
+					mapp[iy][jx] -= 100;
+				}
+			}
+
+			//ブラックスター先の周囲情報を確認
+			if (60 <= map[iy][jx] && map[iy][jx] <= 63) {
+				if (!To_BlackStar(map[iy][jx], iy, jx)) {
+					mapp[iy][jx] -= 100;
+				}
+			}
+
+			//岩盤先の周囲情報を確認
+			if (40 <= map[iy][jx] && map[iy][jx] <= 53) {
+				if (!To_BedRock(map[iy][jx], iy, jx)) {
 					mapp[iy][jx] -= 100;
 				}
 			}
@@ -957,7 +872,15 @@ int main() {
 				score = mapp[y + dist[i].first][x + dist[i].second];
 				p.first = y + dist[i].first;
 				p.second = x + dist[i].second;
-				if (20 <= map[y + dist[i].first][x + dist[i].second] && map[y + dist[i].first][x + dist[i].second] <= 23 || 30 <= map[y + dist[i].first][x + dist[i].second] && map[y + dist[i].first][x + dist[i].second] <= 33 || 40 <= map[y + dist[i].first][x + dist[i].second] && map[y + dist[i].first][x + dist[i].second] <= 53 || 60 <= map[y + dist[i].first][x + dist[i].second] && map[y + dist[i].first][x + dist[i].second] <= 63) {
+				if (20 <= map[y + dist[i].first][x + dist[i].second] && map[y + dist[i].first][x + dist[i].second] <= 23 || 30 <= map[y + dist[i].first][x + dist[i].second] && map[y + dist[i].first][x + dist[i].second] <= 33) {
+					warp = true;
+					warpnum = map[y + dist[i].first][x + dist[i].second];
+				}
+				else if (60 <= map[y + dist[i].first][x + dist[i].second] && map[y + dist[i].first][x + dist[i].second] <= 63) {
+					warp = true;
+					warpnum = map[y + dist[i].first][x + dist[i].second];
+				}
+				else if (40 <= map[y + dist[i].first][x + dist[i].second] && map[y + dist[i].first][x + dist[i].second] <= 53) {
 					warp = true;
 					warpnum = map[y + dist[i].first][x + dist[i].second];
 				}
@@ -1278,8 +1201,18 @@ int main() {
 
 		seen[y][x]++;
 
-		//Warpの場合さらに座標変換
-		if (warp) { Warp(warpnum); seen[y][x]++; }
+		//Warp,BlackStar,BedRockの場合さらに座標変換
+		if (warp) { 
+			Warp(warpnum);
+			BlackStar(warpnum);
+			BedRock(warpnum);
+			seen[y][x]++;
+		}
+
+		if (miny > y)miny = y;
+		if (maxy < y)maxy = y;
+		if (minx > x)minx = x;
+		if (maxx < x)maxx = x;
 
 		score = 0;
 		warp = false;
@@ -1340,7 +1273,15 @@ int main() {
 				score = mapp[y + dy[i]][x + dx[i]];
 				p.first = dy[i];
 				p.second = dx[i];
-				if (20 <= map[y + dy[i]][x + dx[i]] && map[y + dy[i]][x + dx[i]] <= 23 || 30 <= map[y + dy[i]][x + dx[i]] && map[y + dy[i]][x + dx[i]] <= 33 || 40 <= map[y + dy[i]][x + dx[i]] && map[y + dy[i]][x + dx[i]] <= 53 || 60 <= map[y + dy[i]][x + dx[i]] && map[y + dy[i]][x + dx[i]] <= 63) {
+				if (20 <= map[y + dy[i]][x + dx[i]] && map[y + dy[i]][x + dx[i]] <= 23 || 30 <= map[y + dy[i]][x + dx[i]] && map[y + dy[i]][x + dx[i]] <= 33) {
+					warp = true;
+					warpnum = map[y + dy[i]][x + dx[i]];
+				}
+				else if (40 <= map[y + dy[i]][x + dx[i]] && map[y + dy[i]][x + dx[i]] <= 53) {
+					warp = true;
+					warpnum = map[y + dy[i]][x + dx[i]];
+				}
+				else if (60 <= map[y + dy[i]][x + dx[i]] && map[y + dy[i]][x + dx[i]] <= 63) {
 					warp = true;
 					warpnum = map[y + dy[i]][x + dx[i]];
 				}
@@ -1361,6 +1302,7 @@ int main() {
 
 		MapDisplay(y + p.first, x + p.second);
 
+		cout << "最大スコア座標 : " << y + p.first << " " << x + p.second << endl;
 		cout << "getready\n";
 		cout << cmd2 << endl;
 
@@ -1375,8 +1317,18 @@ int main() {
 
 		seen[y][x]++;
 
-		//Warpの場合さらに座標変換
-		if (warp) { Warp(warpnum); seen[y][x]++; }
+		//Warp,BlackStar,BedRockの場合さらに座標変換
+		if (warp) {
+			Warp(warpnum);
+			BlackStar(warpnum);
+			BedRock(warpnum);
+			seen[y][x]++;
+		}
+
+		if (miny > y)miny = y;
+		if (maxy < y)maxy = y;
+		if (minx > x)minx = x;
+		if (maxx < x)maxx = x;
 
 
 	}

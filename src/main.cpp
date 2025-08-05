@@ -168,12 +168,16 @@ void ShowMapping() {
 }
 
 void ShowMapping2() {
-	for (int i = y - 3; i <= y + 3; i++) {
-		for (int j = x - 3; j <= x + 3; j++) {
-			printf("%5d,", map[i][j]);
-		}
-		printf("\n");
-	}
+	//for (int i = y - 3; i <= y + 3; i++) {
+	//	for (int j = x - 3; j <= x + 3; j++) {
+	//		printf("%5d,", map[i][j]);
+	//	}
+	//	printf("\n");
+	//}
+
+	printf("%5d,%5d,%5d\n", returnNum[0], returnNum[1], returnNum[2]);
+	printf("%5d,%5d,%5d\n", returnNum[3], returnNum[4], returnNum[5]);
+	printf("%5d,%5d,%5d\n", returnNum[6], returnNum[7], returnNum[8]);
 }
 
 //マップ表示

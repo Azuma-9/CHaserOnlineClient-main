@@ -58,7 +58,7 @@ void MapUpdate(string cmd) {
 	else if (cmd == "dru") { sy = -3; ey = -1; sx = 1; ex = 3; }
 	else if (cmd == "drd") { sy = 1; ey = 3; sx = 1; ex = 3; }
 	else if (cmd == "dlu") { sy = -3; ey = -1; sx = -3; ex = -1; }
-	else if (cmd == "dld") { sy = 1; ey = 3; sx = 1; ex = 3; }
+	else if (cmd == "dld") { sy = 1; ey = 3; sx = -3; ex = -1; }
 
 	for (int i = sy; i <= ey; i++) {
 		for (int j = sx; j <= ex; j++) {
@@ -80,6 +80,12 @@ void Coordinate(string cmd) {
 	else if (cmd == "pd3sd")map[y + 1][x] = 3;
 	else if (cmd == "pu3su")map[y - 1][x] = 3;
 	else if (cmd == "pr3sr")map[y][x + 1] = 3;
+	else if (cmd == "pd2w2u")map[y + 1][x] = 2;
+	else if (cmd == "pu2w2d")map[y - 1][x] = 2;
+	else if (cmd == "pr2w2l")map[y][x + 1] = 2;
+	else if (cmd == "pl2w2r")map[y][x - 1] = 2;
+
+
 
 	if (cmd == "gru" || cmd == "wu" || cmd == "du" || cmd == "pl3ll" || cmd == "pl3sl")y--;
 	else if (cmd == "grl" || cmd == "wl" || cmd == "dl" || cmd == "pd3ld" || cmd == "pd3sd")x--;
@@ -162,8 +168,8 @@ void ShowMapping() {
 }
 
 void ShowMapping2() {
-	for (int i = y - 1; i <= y + 1; i++) {
-		for (int j = x - 1; j <= x + 1; j++) {
+	for (int i = y - 3; i <= y + 3; i++) {
+		for (int j = x - 3; j <= x + 3; j++) {
 			printf("%5d,", map[i][j]);
 		}
 		printf("\n");
@@ -780,7 +786,7 @@ int main() {
 	while (1) {
 		turn++;
 		double dir;//距離
-		double score = -10000;//最大スコアの格納
+		int score = -10000;//最大スコアの格納
 		pair<int, int>p;//最大スコアマスのy,x座標
 		bool put = false;//putするか
 		bool warp = false;//warpするか
@@ -1234,6 +1240,8 @@ int main() {
 		cout << turn << "ターン目\n";
 		cout << "最大スコア座標 : " << p.first << " " << p.second << endl;
 		cout << "コマンド ; " << cmd << endl;
+		cout << "Warpuフラグ : " << warp << endl;
+		cout << "最大スコア : " << score << endl;
 
 		returnCode = client.FullCommandCheck(cmd);
 		returnNum = ParseInt(returnCode);
@@ -1346,6 +1354,9 @@ int main() {
 		if (reigai)cmd2 = "gr";
 
 		MapDisplay(y + p.first, x + p.second);
+
+		cout << endl;
+		ShowMapping2();
 
 		cout << "最大スコア座標 : " << y + p.first << " " << x + p.second << endl;
 		cout << "getready\n";

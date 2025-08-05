@@ -75,6 +75,12 @@ void Coordinate(string cmd) {
 
 	map[y][x] = 8;
 	mapp[y][x] = 100;
+
+	if (cmd == "pl3sl")map[y][x - 1] = 3;
+	else if (cmd == "pd3sd")map[y + 1][x] = 3;
+	else if (cmd == "pu3su")map[y - 1][x] = 3;
+	else if (cmd == "pr3sr")map[y][x + 1] = 3;
+
 	if (cmd == "gru" || cmd == "wu" || cmd == "du" || cmd == "pl3ll" || cmd == "pl3sl")y--;
 	else if (cmd == "grl" || cmd == "wl" || cmd == "dl" || cmd == "pd3ld" || cmd == "pd3sd")x--;
 	else if (cmd == "grr" || cmd == "wr" || cmd == "dr" || cmd == "pu3lu" || cmd == "pu3su")x++;
@@ -156,8 +162,8 @@ void ShowMapping() {
 }
 
 void ShowMapping2() {
-	for (int i = y - 3; i <= y + 3; i++) {
-		for (int j = x - 3; j <= x + 3; j++) {
+	for (int i = y - 1; i <= y + 1; i++) {
+		for (int j = x - 1; j <= x + 1; j++) {
 			printf("%5d,", map[i][j]);
 		}
 		printf("\n");
@@ -1222,7 +1228,7 @@ int main() {
 		cout << endl;
 		ShowMapping();
 		cout << endl;
-		//ShowMapping2();
+		ShowMapping2();
 
 
 		cout << turn << "ƒ^[ƒ“–Ú\n";

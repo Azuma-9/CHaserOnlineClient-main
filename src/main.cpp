@@ -44,9 +44,13 @@ void MapUpdate(string cmd) {
 	int index = 0;
 
 	if (cmd == "pu3lu") { sy = -3; ey = -1; sx = -1; ex = 1; }
-	else if(cmd=="pd3ld") { sy = 1; ey = 3; sx = -1; ex = 1; }
+	else if (cmd == "pd3ld") { sy = 1; ey = 3; sx = -1; ex = 1; }
 	else if (cmd == "pl3ll") { sy = -1; ey = 1; sx = -3; ex = -1; }
 	else if (cmd == "pr3lr") { sy = -1; ey = 1; sx = 1; ex = 3; }
+	else if (cmd == "pu3su") { sy = -9; ey = -1; sx = 0; ex = 0; }
+	else if (cmd == "pd3sd") { sy = 1; ey = 9; sx = 0; ex = 0; }
+	else if (cmd == "pl3sl") { sy = 0; ey = 0; sx = -9; ex = -1; }
+	else if (cmd == "pr3sr") { sy = 0; ey = 0; sx = 1; ex = 9; }
 	else if (cmd == "du") { sy = -3; ey = -1; sx = -1; ex = 1; }
 	else if (cmd == "dd") { sy = 1; ey = 3; sx = -1; ex = 1; }
 	else if (cmd == "dl") { sy = -1; ey = 1; sx = -3; ex = -1; }
@@ -300,6 +304,7 @@ void MapDisplay(int my, int mx) {
 string DecideCommand(int dy, int dx) {
 	int cnt = 0;//未探索のマス（情報が不明）をカウントするための変数
 	int cnt2 = 0;//未探索のマス（情報が不明）をカウントするための変数
+	int cnt3 = 0;//未探索のマス（情報が不明）をカウントするための変数
 
 	if (dy == y - 1 && dx == x) {//上に行く場合
 
@@ -319,7 +324,16 @@ string DecideCommand(int dy, int dx) {
 			}
 			//4つ以上未探索だったら
 			if (cnt2 >= 4)return "pl3ll";
-			else return "wu";
+			else {
+				for (int i = -1; i <= -1; i++) {
+					for (int j = -9; j <= -1; j++) {
+						if (map[y + i][x + j] == NOT_FOUND)cnt3++;
+					}
+				}
+				//4つ以上未探索だったら
+				if (cnt3 >= 4)return "pl3sl";
+				else return "wu";
+			}
 		}
 	}
 	else if (dy == y + 1 && dx == x) {//下に行く場合
@@ -338,7 +352,15 @@ string DecideCommand(int dy, int dx) {
 				}
 			}
 			if (cnt2 >= 4)return "pr3lr";
-			else return "wd";
+			else {
+				for (int i = 1; i <= 1; i++) {
+					for (int j = 1; i <= 9; i++) {
+						if (map[y + i][x + j] == NOT_FOUND)cnt3++;
+					}
+				}
+				if (cnt3 >= 4)return "pr3sr";
+				else return "wd";
+			}
 		}
 	}
 	else if (dy == y && dx == x - 1) {//左に行く場合
@@ -357,7 +379,15 @@ string DecideCommand(int dy, int dx) {
 				}
 			}
 			if (cnt2 >= 4)return "pd3ld";
-			else return "wl";
+			else {
+				for (int i = 1; i <= 9; i++) {
+					for (int j = -1; j <= -1; j++) {
+						if (map[y + i][x + j] == NOT_FOUND)cnt3++;
+					}
+				}
+				if (cnt3 >= 4)return "pd3sd";
+				else return "wl";
+			}
 		}
 	}
 	else if (dy == y && dx == x + 1) {//右に行く場合
@@ -375,7 +405,15 @@ string DecideCommand(int dy, int dx) {
 				}
 			}
 			if (cnt2 >= 4)return "pu3lu";
-			else return "wr";
+			else {
+				for (int i = -9; i <= -1; i++) {
+					for (int j = 1; j <= 1; j++) {
+						if (map[y + i][x + j] == NOT_FOUND)cnt3++;
+					}
+				}
+				if (cnt3 >= 4)return "pu3su";
+				else return "wr";
+			}
 		}
 	}
 }
@@ -1202,7 +1240,7 @@ int main() {
 		seen[y][x]++;
 
 		//Warp,BlackStar,BedRockの場合さらに座標変換
-		if (warp) { 
+		if (warp) {
 			Warp(warpnum);
 			BlackStar(warpnum);
 			BedRock(warpnum);
@@ -1334,9 +1372,3 @@ int main() {
 
 	}
 }
-
-
-
-
-
-

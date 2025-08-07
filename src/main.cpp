@@ -41,15 +41,16 @@ void MapUpdate(string cmd) {
 	int sy = -1, ey = 1;
 	int sx = -1, ex = 1;
 
+	int cnt = 0;
 	int index = 0;
 
 	if (cmd == "pu3lu") { sy = -3; ey = -1; sx = -1; ex = 1; }
 	else if (cmd == "pd3ld") { sy = 1; ey = 3; sx = -1; ex = 1; }
 	else if (cmd == "pl3ll") { sy = -1; ey = 1; sx = -3; ex = -1; }
 	else if (cmd == "pr3lr") { sy = -1; ey = 1; sx = 1; ex = 3; }
-	else if (cmd == "pu3su") { sy = -9; ey = -1; sx = 0; ex = 0; }
+	//else if (cmd == "pu3su") { sy = -9; ey = -1; sx = 0; ex = 0; }
 	else if (cmd == "pd3sd") { sy = 1; ey = 9; sx = 0; ex = 0; }
-	else if (cmd == "pl3sl") { sy = 0; ey = 0; sx = -9; ex = -1; }
+	//else if (cmd == "pl3sl") { sy = 0; ey = 0; sx = -9; ex = -1; }
 	else if (cmd == "pr3sr") { sy = 0; ey = 0; sx = 1; ex = 9; }
 	else if (cmd == "du") { sy = -3; ey = -1; sx = -1; ex = 1; }
 	else if (cmd == "dd") { sy = 1; ey = 3; sx = -1; ex = 1; }
@@ -60,14 +61,40 @@ void MapUpdate(string cmd) {
 	else if (cmd == "dlu") { sy = -3; ey = -1; sx = -3; ex = -1; }
 	else if (cmd == "dld") { sy = 1; ey = 3; sx = -3; ex = -1; }
 
-	for (int i = sy; i <= ey; i++) {
-		for (int j = sx; j <= ex; j++) {
-			int iy = y + i;
-			int jx = x + j;
-			map[iy][jx] = returnNum[index];
+	//put&searchの場合
+	if (cmd == "pl3sl") {
+		for (int i = 0; i < 9; i++) {
+			if (returnNum[i] != -1)cnt++;
+		}
+		int index = 0;
+		while (cnt > 0) {
+			map[y][x - cnt] = returnNum[index];
 			index++;
+			cnt--;
 		}
 	}
+	else if (cmd == "pu3su") {
+		for (int i = 0; i < 9; i++) {
+			if (returnNum[i] != -1)cnt++;
+		}
+		int index = 0;
+		while (cnt > 0) {
+			map[y - cnt][x] = returnNum[index];
+			index++;
+			cnt--;
+		}
+	}
+	else {
+		for (int i = sy; i <= ey; i++) {
+			for (int j = sx; j <= ex; j++) {
+				int iy = y + i;
+				int jx = x + j;
+				map[iy][jx] = returnNum[index];
+				index++;
+			}
+		}
+	}
+
 }
 
 //座標を移動
@@ -84,8 +111,6 @@ void Coordinate(string cmd) {
 	else if (cmd == "pu2w2d")map[y - 1][x] = 2;
 	else if (cmd == "pr2w2l")map[y][x + 1] = 2;
 	else if (cmd == "pl2w2r")map[y][x - 1] = 2;
-
-
 
 	if (cmd == "gru" || cmd == "wu" || cmd == "du" || cmd == "pl3ll" || cmd == "pl3sl")y--;
 	else if (cmd == "grl" || cmd == "wl" || cmd == "dl" || cmd == "pd3ld" || cmd == "pd3sd")x--;
@@ -168,12 +193,12 @@ void ShowMapping() {
 }
 
 void ShowMapping2() {
-	//for (int i = y - 3; i <= y + 3; i++) {
-	//	for (int j = x - 3; j <= x + 3; j++) {
-	//		printf("%5d,", map[i][j]);
-	//	}
-	//	printf("\n");
-	//}
+	for (int i = y - 3; i <= y + 3; i++) {
+		for (int j = x - 3; j <= x + 3; j++) {
+			printf("%5d,", map[i][j]);
+		}
+		printf("\n");
+	}
 
 	printf("%5d,%5d,%5d\n", returnNum[0], returnNum[1], returnNum[2]);
 	printf("%5d,%5d,%5d\n", returnNum[3], returnNum[4], returnNum[5]);
@@ -719,6 +744,13 @@ bool To_BedRock(int warpnum, int Y, int X) {
 	}
 }
 
+bool WarpCheck(int warpnum) {
+	if (20 <= warpnum && warpnum <= 23 || 30 <= warpnum && warpnum <= 33)return true;
+	else if (40 <= warpnum && warpnum <= 53)return true;
+	else if (60 <= warpnum && warpnum <= 63)return true;
+	else return false;
+}
+
 //移動可能なマスに行くためのペア
 vector<pair<int, int>>dist = {//0-19
 	{-1,0},{0,-1},{0,1},{1,0},
@@ -1058,6 +1090,10 @@ int main() {
 					sort(mp.rbegin(), mp.rend());
 					for (int i = 0; i < 5; i++) {
 						if (mp[i] == mapp[y - 2][x - 1] && mp[i] > 0) {
+							if (WarpCheck(map[y - 2][x - 1])) {
+								warp = true;
+								warpnum = map[y - 2][x - 1];
+							}
 							cmd = "keilu";
 							p.first = y - 2;
 							p.second = x - 1;
@@ -1065,6 +1101,10 @@ int main() {
 							break;
 						}
 						if (mp[i] == mapp[y - 1][x - 1] && mp[i] > 0) {
+							if (WarpCheck(map[y - 1][x - 1])) {
+								warp = true;
+								warpnum = map[y - 1][x - 1];
+							}
 							cmd = "dlu";
 							p.first = y - 1;
 							p.second = x - 1;
@@ -1072,6 +1112,10 @@ int main() {
 							break;
 						}
 						if (mp[i] == mapp[y][x - 1] && mp[i] > 0) {
+							if (WarpCheck(map[y][x - 1])) {
+								warp = true;
+								warpnum = map[y][x - 1];
+							}
 							cmd = "wl";
 							p.first = y;
 							p.second = x - 1;
@@ -1079,6 +1123,10 @@ int main() {
 							break;
 						}
 						if (mp[i] == mapp[y][x - 2] && mp[i] > 0) {
+							if (WarpCheck(map[y][x - 2])) {
+								warp = true;
+								warpnum = map[y][x - 2];
+							}
 							cmd = "pr2w2l";
 							p.first = y;
 							p.second = x - 2;
@@ -1086,6 +1134,10 @@ int main() {
 							break;
 						}
 						if (mp[i] == mapp[y][x - 3] && mp[i] > 0) {
+							if (WarpCheck(map[y][x - 3])) {
+								warp = true;
+								warpnum = map[y][x - 3];
+							}
 							cmd = "w3l";
 							p.first = y;
 							p.second = x - 3;
@@ -1095,7 +1147,7 @@ int main() {
 					}
 				}
 
-				if (z[1]) {
+				else if (z[1]) {
 					mp[0] = mapp[y - 2][x + 1];
 					mp[1] = mapp[y - 1][x + 1];
 					mp[2] = mapp[y][x + 1];
@@ -1104,6 +1156,10 @@ int main() {
 					sort(mp.rbegin(), mp.rend());
 					for (int i = 0; i < 5; i++) {
 						if (mp[i] == mapp[y - 2][x + 1] && mp[i] > 0) {
+							if (WarpCheck(map[y - 2][x + 1])) {
+								warp = true;
+								warpnum = map[y - 2][x + 1];
+							}
 							cmd = "keiru";
 							p.first = y - 2;
 							p.second = x + 1;
@@ -1111,6 +1167,10 @@ int main() {
 							break;
 						}
 						if (mp[i] == mapp[y - 1][x + 1] && mp[i] > 0) {
+							if (WarpCheck(map[y - 1][x + 1])) {
+								warp = true;
+								warpnum = map[y - 1][x + 1];
+							}
 							cmd = "dru";
 							p.first = y - 1;
 							p.second = x + 1;
@@ -1118,6 +1178,10 @@ int main() {
 							break;
 						}
 						if (mp[i] == mapp[y][x + 1] && mp[i] > 0) {
+							if (WarpCheck(map[y][x + 1])) {
+								warp = true;
+								warpnum = map[y][x + 1];
+							}
 							cmd = "wr";
 							p.first = y;
 							p.second = x + 1;
@@ -1125,6 +1189,10 @@ int main() {
 							break;
 						}
 						if (mp[i] == mapp[y][x + 2] && mp[i] > 0) {
+							if (WarpCheck(map[y][x + 2])) {
+								warp = true;
+								warpnum = map[y][x + 2];
+							}
 							cmd = "pl2w2r";
 							p.first = y;
 							p.second = x + 2;
@@ -1132,6 +1200,10 @@ int main() {
 							break;
 						}
 						if (mp[i] == mapp[y][x + 3] && mp[i] > 0) {
+							if (WarpCheck(map[y][x + 3])) {
+								warp = true;
+								warpnum = map[y][x + 3];
+							}
 							cmd = "w3r";
 							p.first = y;
 							p.second = x + 3;
@@ -1141,7 +1213,7 @@ int main() {
 					}
 				}
 
-				if (z[2]) {
+				else if (z[2]) {
 					mp[0] = mapp[y][x - 3];
 					mp[1] = mapp[y][x - 2];
 					mp[2] = mapp[y][x - 1];
@@ -1150,6 +1222,10 @@ int main() {
 					sort(mp.rbegin(), mp.rend());
 					for (int i = 0; i < 5; i++) {
 						if (mp[i] == mapp[y][x - 3] && mp[i] > 0) {
+							if (WarpCheck(map[y][x - 3])) {
+								warp = true;
+								warpnum = map[y][x - 3];
+							}
 							cmd = "w3l";
 							p.first = y;
 							p.second = x - 3;
@@ -1157,6 +1233,10 @@ int main() {
 							break;
 						}
 						if (mp[i] == mapp[y][x - 2] && mp[i] > 0) {
+							if (WarpCheck(map[y][x - 2])) {
+								warp = true;
+								warpnum = map[y][x - 2];
+							}
 							cmd = "pr2w2l";
 							p.first = y;
 							p.second = x - 2;
@@ -1164,6 +1244,10 @@ int main() {
 							break;
 						}
 						if (mp[i] == mapp[y][x - 1] && mp[i] > 0) {
+							if (WarpCheck(map[y][x - 1])) {
+								warp = true;
+								warpnum = map[y][x - 1];
+							}
 							cmd = "wl";
 							p.first = y;
 							p.second = x - 1;
@@ -1171,6 +1255,10 @@ int main() {
 							break;
 						}
 						if (mp[i] == mapp[y + 1][x - 1] && mp[i] > 0) {
+							if (WarpCheck(map[y + 1][x - 1])) {
+								warp = true;
+								warpnum = map[y + 1][x - 1];
+							}
 							cmd = "dld";
 							p.first = y + 1;
 							p.second = x - 1;
@@ -1178,6 +1266,10 @@ int main() {
 							break;
 						}
 						if (mp[i] == mapp[y + 2][x - 1] && mp[i] > 0) {
+							if (WarpCheck(map[y + 2][x - 1])) {
+								warp = true;
+								warpnum = map[y + 2][x - 1];
+							}
 							cmd = "keild";
 							p.first = y + 2;
 							p.second = x - 1;
@@ -1186,7 +1278,7 @@ int main() {
 						}
 					}
 				}
-				if (z[3]) {
+				else if (z[3]) {
 					mp[0] = mapp[y][x + 1];
 					mp[1] = mapp[y][x + 2];
 					mp[2] = mapp[y][x + 3];
@@ -1195,6 +1287,10 @@ int main() {
 					sort(mp.rbegin(), mp.rend());
 					for (int i = 0; i < 5; i++) {
 						if (mp[i] == mapp[y][x + 1] && mp[i] > 0) {
+							if (WarpCheck(map[y][x + 1])) {
+								warp = true;
+								warpnum = map[y][x + 1];
+							}
 							cmd = "wr";
 							p.first = y;
 							p.second = x + 1;
@@ -1202,6 +1298,10 @@ int main() {
 							break;
 						}
 						if (mp[i] == mapp[y][x + 2] && mp[i] > 0) {
+							if (WarpCheck(map[y][x + 2])) {
+								warp = true;
+								warpnum = map[y][x + 2];
+							}
 							cmd = "pl2w2r";
 							p.first = y;
 							p.second = x + 2;
@@ -1209,6 +1309,10 @@ int main() {
 							break;
 						}
 						if (mp[i] == mapp[y][x + 3] && mp[i] > 0) {
+							if (WarpCheck(map[y][x + 3])) {
+								warp = true;
+								warpnum = map[y][x + 3];
+							}
 							cmd = "w3r";
 							p.first = y;
 							p.second = x + 3;
@@ -1216,6 +1320,10 @@ int main() {
 							break;
 						}
 						if (mp[i] == mapp[y + 1][x + 1] && mp[i] > 0) {
+							if (WarpCheck(map[y + 1][x + 1])) {
+								warp = true;
+								warpnum = map[y + 1][x + 1];
+							}
 							cmd = "drd";
 							p.first = y + 1;
 							p.second = x + 1;
@@ -1223,6 +1331,10 @@ int main() {
 							break;
 						}
 						if (mp[i] == mapp[y + 2][x + 1] && mp[i] > 0) {
+							if (WarpCheck(map[y + 2][x + 1])) {
+								warp = true;
+								warpnum = map[y + 2][x + 1];
+							}
 							cmd = "keird";
 							p.first = y + 2;
 							p.second = x + 1;
@@ -1236,9 +1348,9 @@ int main() {
 		//map表示
 		MapDisplay(p.first, p.second);
 		cout << endl;
-		ShowMapping();
+		//ShowMapping();
 		cout << endl;
-		ShowMapping2();
+		//ShowMapping2();
 
 
 		cout << turn << "ターン目\n";
@@ -1360,7 +1472,7 @@ int main() {
 		MapDisplay(y + p.first, x + p.second);
 
 		cout << endl;
-		ShowMapping2();
+		//ShowMapping2();
 
 		cout << "最大スコア座標 : " << y + p.first << " " << x + p.second << endl;
 		cout << "getready\n";

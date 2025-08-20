@@ -1,5 +1,8 @@
 #include "../include/CHaser_Main.h"
 #include <sstream>
+#include <iostream>
+#include <algorithm>
+#include <vector>
 using namespace std;
 
 vector<vector<int>>map(100, vector<int>(100, NOT_FOUND));//周囲情報を格納する二次元配列
@@ -111,6 +114,10 @@ void Coordinate(string cmd) {
 	else if (cmd == "pu2w2d")map[y - 1][x] = 2;
 	else if (cmd == "pr2w2l")map[y][x + 1] = 2;
 	else if (cmd == "pl2w2r")map[y][x - 1] = 2;
+	else if (cmd == "pru2w2ld")map[y - 1][x + 1] = 2;
+	else if (cmd == "plu2w2rd")map[y - 1][x - 1] = 2;
+	else if (cmd == "prd2w2lu")map[y + 1][x + 1] = 2;
+	else if (cmd == "pld2w2ru")map[y + 1][x - 1] = 2;
 
 	if (cmd == "gru" || cmd == "wu" || cmd == "du" || cmd == "pl3ll" || cmd == "pl3sl")y--;
 	else if (cmd == "grl" || cmd == "wl" || cmd == "dl" || cmd == "pd3ld" || cmd == "pd3sd")x--;
@@ -120,6 +127,10 @@ void Coordinate(string cmd) {
 	else if (cmd == "pu2w2d")y += 2;
 	else if (cmd == "pr2w2l")x -= 2;
 	else if (cmd == "pl2w2r")x += 2;
+	else if (cmd == "pru2w2ld") { y += 2; x -= 2; }
+	else if (cmd == "plu2w2rd") { y += 2; x += 2; }
+	else if (cmd == "prd2w2lu") { y -= 2; x -= 2; }
+	else if (cmd == "pld2w2ru") { y -= 2; x += 2; }
 	else if (cmd == "w3u")y -= 3;
 	else if (cmd == "w3d")y += 3;
 	else if (cmd == "w3l")x -= 3;
@@ -836,7 +847,7 @@ int main() {
 
 		//周囲に敵クライアントがいるかチェック
 		for (int i = 0; i < 9; i++) {
-			if (i == 4 || i == 0 || i == 2 || i == 6 || i == 8)continue;
+			if (i == 4)continue;
 			if (1000 <= returnNum[i])put = true;
 		}
 
@@ -981,10 +992,14 @@ int main() {
 
 		//putする場合
 		if (put) {
-			if (returnNum[1] >= 1000)cmd = "pu2w2d";
+			if (returnNum[0] >= 1000)cmd = "plu2w2rd";
+			else if (returnNum[1] >= 1000)cmd = "pu2w2d";
+			else if (returnNum[2] >= 1000)cmd = "pru2w2ld";
 			else if (returnNum[3] >= 1000)cmd = "pl2w2r";
 			else if (returnNum[5] >= 1000)cmd = "pr2w2l";
+			else if (returnNum[6] >= 1000)cmd = "pld2w2ru";
 			else if (returnNum[7] >= 1000)cmd = "pd2w2u";
+			else if (returnNum[8] >= 1000)cmd = "prd2w2lu";
 		}
 		else {
 			//現在の座標と最もスコアが高いマスの距離
@@ -1094,6 +1109,7 @@ int main() {
 								warp = true;
 								warpnum = map[y - 2][x - 1];
 							}
+							else warp = false;
 							cmd = "keilu";
 							p.first = y - 2;
 							p.second = x - 1;
@@ -1105,6 +1121,7 @@ int main() {
 								warp = true;
 								warpnum = map[y - 1][x - 1];
 							}
+							else warp = false;
 							cmd = "dlu";
 							p.first = y - 1;
 							p.second = x - 1;
@@ -1116,6 +1133,7 @@ int main() {
 								warp = true;
 								warpnum = map[y][x - 1];
 							}
+							else warp = false;
 							cmd = "wl";
 							p.first = y;
 							p.second = x - 1;
@@ -1127,6 +1145,7 @@ int main() {
 								warp = true;
 								warpnum = map[y][x - 2];
 							}
+							else warp = false;
 							cmd = "pr2w2l";
 							p.first = y;
 							p.second = x - 2;
@@ -1138,6 +1157,7 @@ int main() {
 								warp = true;
 								warpnum = map[y][x - 3];
 							}
+							else warp = false;
 							cmd = "w3l";
 							p.first = y;
 							p.second = x - 3;
@@ -1160,6 +1180,7 @@ int main() {
 								warp = true;
 								warpnum = map[y - 2][x + 1];
 							}
+							else warp = false;
 							cmd = "keiru";
 							p.first = y - 2;
 							p.second = x + 1;
@@ -1171,6 +1192,7 @@ int main() {
 								warp = true;
 								warpnum = map[y - 1][x + 1];
 							}
+							else warp = false;
 							cmd = "dru";
 							p.first = y - 1;
 							p.second = x + 1;
@@ -1182,6 +1204,7 @@ int main() {
 								warp = true;
 								warpnum = map[y][x + 1];
 							}
+							else warp = false;
 							cmd = "wr";
 							p.first = y;
 							p.second = x + 1;
@@ -1193,6 +1216,7 @@ int main() {
 								warp = true;
 								warpnum = map[y][x + 2];
 							}
+							else warp = false;
 							cmd = "pl2w2r";
 							p.first = y;
 							p.second = x + 2;
@@ -1204,6 +1228,7 @@ int main() {
 								warp = true;
 								warpnum = map[y][x + 3];
 							}
+							else warp = false;
 							cmd = "w3r";
 							p.first = y;
 							p.second = x + 3;
@@ -1226,6 +1251,7 @@ int main() {
 								warp = true;
 								warpnum = map[y][x - 3];
 							}
+							else warp = false;
 							cmd = "w3l";
 							p.first = y;
 							p.second = x - 3;
@@ -1237,6 +1263,7 @@ int main() {
 								warp = true;
 								warpnum = map[y][x - 2];
 							}
+							else warp = false;
 							cmd = "pr2w2l";
 							p.first = y;
 							p.second = x - 2;
@@ -1248,6 +1275,7 @@ int main() {
 								warp = true;
 								warpnum = map[y][x - 1];
 							}
+							else warp = false;
 							cmd = "wl";
 							p.first = y;
 							p.second = x - 1;
@@ -1259,6 +1287,7 @@ int main() {
 								warp = true;
 								warpnum = map[y + 1][x - 1];
 							}
+							else warp = false;
 							cmd = "dld";
 							p.first = y + 1;
 							p.second = x - 1;
@@ -1270,6 +1299,7 @@ int main() {
 								warp = true;
 								warpnum = map[y + 2][x - 1];
 							}
+							else warp = false;
 							cmd = "keild";
 							p.first = y + 2;
 							p.second = x - 1;
@@ -1291,6 +1321,7 @@ int main() {
 								warp = true;
 								warpnum = map[y][x + 1];
 							}
+							else warp = false;
 							cmd = "wr";
 							p.first = y;
 							p.second = x + 1;
@@ -1302,6 +1333,7 @@ int main() {
 								warp = true;
 								warpnum = map[y][x + 2];
 							}
+							else warp = false;
 							cmd = "pl2w2r";
 							p.first = y;
 							p.second = x + 2;
@@ -1313,6 +1345,7 @@ int main() {
 								warp = true;
 								warpnum = map[y][x + 3];
 							}
+							else warp = false;
 							cmd = "w3r";
 							p.first = y;
 							p.second = x + 3;
@@ -1324,6 +1357,7 @@ int main() {
 								warp = true;
 								warpnum = map[y + 1][x + 1];
 							}
+							else warp = false;
 							cmd = "drd";
 							p.first = y + 1;
 							p.second = x + 1;
@@ -1335,6 +1369,7 @@ int main() {
 								warp = true;
 								warpnum = map[y + 2][x + 1];
 							}
+							else warp = false;
 							cmd = "keird";
 							p.first = y + 2;
 							p.second = x + 1;

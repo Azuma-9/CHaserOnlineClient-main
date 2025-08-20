@@ -53,10 +53,10 @@ int main(int argc, char** argv) {
 #endif
 	if (roomNumber.empty()) roomNumber = ROOM_NUMBER;
 
-	std::cout << "ユーザー名: ";
-	std::cin >> username;
-	std::cout << "ルーム番号: ";
-	std::cin >> roomNumber;
+	//std::cout << "ユーザー名: ";
+	//std::cin >> username;
+	//std::cout << "ルーム番号: ";
+	//std::cin >> roomNumber;
 
 	CHaser::Utils::Log("プロキシ: " + proxyHost + ":" + proxyPort, CHaser::Utils::CLIENT);
 	CHaser::Utils::Log("サーバー: " + targetHost + ":" + targetPort, CHaser::Utils::CLIENT);
